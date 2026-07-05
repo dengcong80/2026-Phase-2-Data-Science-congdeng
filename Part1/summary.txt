@@ -1,0 +1,15 @@
+# Phase 2 - Part 1: EDA and Preprocessing Summary
+
+## 1. Steps Taken to Prepare Datasets
+Throughout this phase, rigorous Exploratory Data Analysis (EDA) and data preprocessing pipelines were implemented on both the `W Store Sales` and `X Store Sales` datasets to prepare them for machine learning models:
+*   **Data Ingestion & Inspection:** Successfully loaded the datasets and utilized descriptive statistics (`describe()`) to capture the central tendencies and raw distributions of all features.
+*   **Data Type Conversion:** Transformed all text-based, categorical, and datetime formats into strict numerical forms. Extracted granular `Year` and `Month` variables from temporal data, while categorically encoding strings (e.g., `Type`, `Category`, `Segment`) to prevent string-parsing errors in ML algorithms.
+*   **Missing Value Imputation:** Checked for data sparsity. Missing numerical attributes in feature files were imputed using the median to prevent skewed distributions, while entirely incomplete instances in sales tables were dropped to preserve structural integrity.
+*   **Outlier Handling & Standardization:** Applied Winsorization (clipping to the 1st and 99th percentiles) to restrict the impact of extreme outliers. Subsequently, applied a `StandardScaler` to standardize all continuous numerical columns, ensuring features share a similar variance range (a critical step for distance-based ML models).
+*   **Handling Imbalanced Data:** Addressed severe target imbalances (e.g., `IsHoliday` classifications) by applying a Random Undersampling technique to the majority class. This guarantees that future classifiers will not learn a biased predictive boundary.
+*   **Feature Engineering & Selection:** Utilized correlation heatmaps to identify overlapping dependencies. Dropped highly correlated temporal variables (such as `Week` or `Ship Year`) to mitigate multicollinearity. Finally, synthesized disparate tables (sales, features, stores) via an inner merge to form a rich, unified dataset.
+
+## 2. Interesting Findings During EDA
+*   **Temporal Multicollinearity:** A critical discovery was the near-perfect correlation (>0.95) between `Week` and `Month` in the W Store dataset, as well as `Order Year` and `Ship Year` in the X Store dataset. Retaining all these columns would artificially inflate the variance of model coefficients. Dropping the shipping timeline drastically simplified the feature space without losing predictive power.
+*   **Holiday Sales Dynamics:** Visualizations confirmed that average weekly sales spike notably during holidays, yet the overall dataset is massively skewed toward non-holidays. Without the undersampling applied in the cleaning phase, a model would heavily bias toward non-holiday behaviors, resulting in poor holiday forecasting.
+*   **Store Size as a Proxy:** The `Size` of the W Stores exhibited distinct clustering based on the categorical `Type` (A, B, or C). This indicates that store Type is essentially a categorical proxy for retail footprint, which is invaluable context for a regression model predicting raw sales volume.
